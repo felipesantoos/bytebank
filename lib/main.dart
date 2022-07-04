@@ -10,21 +10,32 @@ class ByteBankApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      theme: ThemeData(
+        appBarTheme: AppBarTheme(
+          backgroundColor: Colors.purple[700],
+        ),
+      ),
       debugShowCheckedModeBanner: false,
       initialRoute: '/',
       routes: {
-        '/': (context) => const TransferList(),
+        '/': (context) => TransferList(),
         '/form': (context) => TransferForm(),
       },
     );
   }
 }
 
-class TransferForm extends StatelessWidget {
+class TransferForm extends StatefulWidget {
   TransferForm({Key? key}) : super(key: key);
 
+  @override
+  State<TransferForm> createState() => _TransferFormState();
+}
+
+class _TransferFormState extends State<TransferForm> {
   final TextEditingController _controllerFieldAccountNumber =
       TextEditingController();
+
   final TextEditingController _controllerFieldValue = TextEditingController();
 
   @override
@@ -32,37 +43,38 @@ class TransferForm extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Add new transfer'),
-        backgroundColor: Colors.purple.shade700,
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-        child: ListView(
-          children: <Widget>[
-            CustomTextField(
-              controller: _controllerFieldAccountNumber,
-              labelText: 'Account number',
-              hintText: '00000-0',
-              prefixIcon: Icons.numbers,
-            ),
-            CustomTextField(
-              controller: _controllerFieldValue,
-              labelText: 'Value',
-              hintText: '0.00',
-              prefixIcon: Icons.monetization_on,
-            ),
-            Container(
-              margin: const EdgeInsets.only(top: 8.0),
-              child: ElevatedButton(
-                onPressed: () => _createTransfer(context),
-                style: ButtonStyle(
-                  backgroundColor: MaterialStateColor.resolveWith((states) {
-                    return Colors.purple.shade700;
-                  }),
-                ),
-                child: const Text('Confirm'),
+        child: SingleChildScrollView(
+          child: Column(
+            children: <Widget>[
+              CustomTextField(
+                controller: _controllerFieldAccountNumber,
+                labelText: 'Account number',
+                hintText: '00000-0',
+                prefixIcon: Icons.numbers,
               ),
-            ),
-          ],
+              CustomTextField(
+                controller: _controllerFieldValue,
+                labelText: 'Value',
+                hintText: '0.00',
+                prefixIcon: Icons.monetization_on,
+              ),
+              Container(
+                margin: const EdgeInsets.only(top: 8.0),
+                child: ElevatedButton(
+                  onPressed: () => _createTransfer(context),
+                  style: ButtonStyle(
+                    backgroundColor: MaterialStateColor.resolveWith((states) {
+                      return Colors.purple.shade700;
+                    }),
+                  ),
+                  child: const Text('Confirm'),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -122,33 +134,28 @@ class CustomTextField extends StatelessWidget {
 }
 
 class TransferList extends StatefulWidget {
-  const TransferList({Key? key}) : super(key: key);
+  TransferList({Key? key}) : super(key: key);
+
+  final List<Transfer> _transferList = [];
 
   @override
   State<TransferList> createState() => _TransferListState();
 }
 
 class _TransferListState extends State<TransferList> {
-  final List<Transfer> _transferList = [];
-
-  @override
-  void initState() {
-    super.initState();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Transfers'),
-        backgroundColor: Colors.purple.shade700,
       ),
       body: Scrollbar(
         thickness: 8.0,
         child: ListView.builder(
-          itemCount: _transferList.length,
+          padding: const EdgeInsets.only(top: 4.0),
+          itemCount: widget._transferList.length,
           itemBuilder: (context, index) {
-            return TransferItem(_transferList[index]);
+            return TransferItem(widget._transferList[index]);
           },
         ),
       ),
@@ -158,7 +165,7 @@ class _TransferListState extends State<TransferList> {
           data.then((transfer) {
             if (transfer != null) {
               setState((){
-                _transferList.add(transfer as Transfer);
+                widget._transferList.add(transfer as Transfer);
               });
             }
           });
