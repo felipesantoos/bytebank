@@ -11,7 +11,11 @@ class ByteBankApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: TransferList(),
+      initialRoute: '/',
+      routes: {
+        '/': (context) => const TransferList(),
+        '/form': (context) => TransferForm(),
+      },
     );
   }
 }
@@ -118,30 +122,18 @@ class CustomTextField extends StatelessWidget {
 }
 
 class TransferList extends StatefulWidget {
-  TransferList({Key? key}) : super(key: key);
+  const TransferList({Key? key}) : super(key: key);
 
   @override
   State<TransferList> createState() => _TransferListState();
 }
 
 class _TransferListState extends State<TransferList> {
-  late List<Transfer> _transferList;
+  final List<Transfer> _transferList = [];
 
   @override
   void initState() {
     super.initState();
-    _transferList = [
-      Transfer(value: 100.0, accountNumber: '00000-1'),
-      Transfer(value: 200.0, accountNumber: '00000-2'),
-      Transfer(value: 300.0, accountNumber: '00000-3'),
-      Transfer(value: 400.0, accountNumber: '00000-4'),
-      Transfer(value: 500.0, accountNumber: '00000-5'),
-      Transfer(value: 600.0, accountNumber: '00000-6'),
-      Transfer(value: 700.0, accountNumber: '00000-7'),
-      Transfer(value: 800.0, accountNumber: '00000-8'),
-      Transfer(value: 900.0, accountNumber: '00000-9'),
-      Transfer(value: 1000.0, accountNumber: '00001-0'),
-    ];
   }
 
   @override
@@ -162,16 +154,11 @@ class _TransferListState extends State<TransferList> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          final Future<Transfer?> data = Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => TransferForm(),
-            ),
-          );
+          final Future data = Navigator.pushNamed(context, '/form');
           data.then((transfer) {
             if (transfer != null) {
               setState((){
-                _transferList.add(transfer);
+                _transferList.add(transfer as Transfer);
               });
             }
           });
